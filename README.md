@@ -1,4 +1,4 @@
-# FGRP5 Fortran Port — Einstein@Home Anonymous Platform App
+# Wisteria — FGRP5 Fortran Port (Einstein@Home Anonymous Platform App)
 
 A modern Fortran reimplementation of the Einstein@Home FGRP5 gamma-ray
 pulsar search, packaged as a BOINC anonymous-platform application
