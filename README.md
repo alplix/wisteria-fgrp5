@@ -39,5 +39,4 @@ OpenMP-parallel — set `Max CPUs` / `app_config` to control thread use.
 
 Science algorithms from the Einstein@Home FGRP5 application
 (H. J. Pletsch et al., Albert-Einstein-Institut). Port by Alperen Yavuz.
-Run in accordance with Einstein@Home's custom-application policy;
-please notify sourcecode@einsteinathome.org about custom app versions.
+Run in accordance with Einstein@Home's custom-application policy.
