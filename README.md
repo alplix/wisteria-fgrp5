@@ -14,12 +14,14 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
-  - Windows x64 zip: self-contained executable (no runtime installs needed)
+  - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
+  - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### Why are there two Linux x64 versions?
+### Why are there two versions (Linux and Windows)?
 
-Both target 64-bit Intel/AMD Linux, but for different generations of CPUs - the same
-split the stock Einstein@Home app uses (SSE2 vs AVX builds):
+Both the Linux and Windows releases come in a baseline and an x86-64-v3
+(AVX2/FMA) variant - the same split the stock Einstein@Home app uses
+(SSE2 vs AVX builds):
 
 - **x86-64 (baseline)** - the safest choice. Runs on every 64-bit x86 CPU since 2003,
   including very old or low-end machines. Pick this if you don't know your CPU.
@@ -31,8 +33,8 @@ The v3 build will **not** run on CPUs without AVX2/FMA - it crashes with SIGILL
 (illegal instruction), which is why the baseline is kept. BOINC picks the correct
 plan class per machine automatically; for manual installs, match your CPU.
 
-The other two packages are single-variant: **aarch64** for ARM64 (Jetson, Raspberry Pi 5,
-Ampere) and **Windows x64**.
+The remaining package is single-variant: **aarch64** for ARM64 (Jetson,
+Raspberry Pi 5, Ampere).
 
 Every archive includes `app_info.xml` (with the confirmed
 `<plan_class>FGRPSSE</plan_class>`) and `app_config.xml` - unpack into your
