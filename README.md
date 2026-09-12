@@ -20,6 +20,10 @@ Every archive includes `app_info.xml` (with the confirmed
 `<plan_class>FGRPSSE</plan_class>`) and `app_config.xml` - unpack into your
 BOINC project folder, restart the client, done.
 
+The executable is named `wisteria` (Linux) / `wisteria.exe` (Windows). On
+start it prints a stderr banner with the GPL v2 notice, app name/version,
+author (Alperen Yavuz) and project URL (github.com/alplix/wisteria-fgrp5).
+
 ## What changed in v0.3.1
 
 Code-review pass over the full Fortran pipeline, 6 fixes applied and all
