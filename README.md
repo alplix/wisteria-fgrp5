@@ -11,10 +11,28 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 ## Downloads
 
 - **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.1
-  - Linux x86-64 tarball: static build, baseline ISA
-  - Linux x86-64 v3 tarball: AVX2/FMA optimized static build
+  - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
+  - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 zip: self-contained executable (no runtime installs needed)
+
+### Why are there two Linux x64 versions?
+
+Both target 64-bit Intel/AMD Linux, but for different generations of CPUs - the same
+split the stock Einstein@Home app uses (SSE2 vs AVX builds):
+
+- **x86-64 (baseline)** - the safest choice. Runs on every 64-bit x86 CPU since 2003,
+  including very old or low-end machines. Pick this if you don't know your CPU.
+- **x86-64-v3 (AVX2/FMA)** - compiled for the x86-64-v3 instruction set (Intel Haswell+,
+  AMD Excavator+/2013+). Clearly faster on supported CPUs: roughly 15-30% shorter
+  runtimes thanks to the 256-bit SIMD FFT path and fused multiply-add.
+
+The v3 build will **not** run on CPUs without AVX2/FMA - it crashes with SIGILL
+(illegal instruction), which is why the baseline is kept. BOINC picks the correct
+plan class per machine automatically; for manual installs, match your CPU.
+
+The other two packages are single-variant: **aarch64** for ARM64 (Jetson, Raspberry Pi 5,
+Ampere) and **Windows x64**.
 
 Every archive includes `app_info.xml` (with the confirmed
 `<plan_class>FGRPSSE</plan_class>`) and `app_config.xml` - unpack into your
