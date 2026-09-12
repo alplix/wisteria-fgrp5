@@ -1,41 +1,48 @@
-# ✧ Wisteria — FGRP5 at warp speed ✧
+# Wisteria - FGRP5 at warp speed
 
 A from-scratch modern reimplementation of the Einstein@Home FGRP5
-gamma-ray pulsar search, packaged as ready-to-run BOINC anonymous
-platform apps for **Linux x86-64, Linux ARM64 and Windows x64**.
+gamma-ray pulsar search, packaged as ready-to-run BOINC anonymous-platform
+apps for **Linux x86-64, Linux x86-64-v3 (AVX2/FMA), Linux aarch64 and
+Windows x64**.
 
-**Coded by Alperen Yavuz.** Binary releases only — source availability
-is restricted per the upstream authors' request. GPLv2+ like upstream.
+**Coded by Alperen Yavuz.** Binary releases only - source availability is
+restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-⬤ **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** — v0.2.1
-  - Linux x86-64 tarball: baseline + AVX2 + AVX-512 builds (static FFTW/BOINC)
-  - Linux ARM64 tarball: Jetson, Raspberry Pi 5, Ampere
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.1
+  - Linux x86-64 tarball: static build, baseline ISA
+  - Linux x86-64 v3 tarball: AVX2/FMA optimized static build
+  - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 zip: self-contained executable (no runtime installs needed)
 
 Every archive includes `app_info.xml` (with the confirmed
-`<plan_class>FGRPSSE</plan_class>`) and `app_config.xml` — unpack into
-your project folder, restart BOINC, done.
+`<plan_class>FGRPSSE</plan_class>`) and `app_config.xml` - unpack into your
+BOINC project folder, restart the client, done.
 
-## Why another build?
+## What changed in v0.3.1
 
-The stock CPU application still targets a ~2008 baseline: SSE2, no FMA,
-an old compiler, no multi-core. Wisteria rebuilds the entire pipeline
-for modern hardware:
+Code-review pass over the full Fortran pipeline, 6 fixes applied and all
+packages rebuilt/verified:
 
-- **Per-microarchitecture builds** — AVX2 + FMA, AVX-512, ARM NEON
-- **Measured 2.1× speedup** of the semicoherent stage (AVX2 build vs baseline)
-- **Windows build JIT-compiles to your exact CPU** on first run
-- **OpenMP parallel** scan engine with per-sky-point checkpointing
-  (survives kill -9, validated)
+- Coherent follow-up: added the missing `- mjd_ref_frac` subtraction
+  (consistent with the semicoherent stage; prevented a shift with
+  fractional-day `--reftime`)
+- Switched the monotonic clock to `system_clock` (no negative durations
+  across midnight)
+- Fixed `bfraction_done` normalization so progress reaches 1.0 on the last
+  sky point
+- Checkpoint `read`: clamped to the toplist size (no overflow on corrupt
+  files); `write`: fixed Windows `rename()` failure by deleting the old
+  checkpoint first (no stale `.tmp` residue)
+- Removed a dead-statistic expression
 
-## Numerical fidelity
+## Verified
 
-Not just fast — verified against the upstream application on identical
-input: FFT spectra agree to float32 precision (1.1e-7 over 4.19M bins),
-candidate toplists identical (50/50, powers within 1.3e-7 relative).
-The same injected-pulsar test passes on x86-64, ARM64 (qemu) and Windows.
+- Top candidate `f0=12.3457260` **identical on all four platforms**
+- DE430 ephemeris, Windows 11 & Linux: `S=29.73155 P=47.64821`, top candidate
+  bit-exact; lower toplist ranks match to 1e-5 (FMA rounding noise)
+- `SHA256SUMS` checked with `sha256sum -c`
 
 ## This build is for you if...
 
@@ -45,7 +52,7 @@ The same injected-pulsar test passes on x86-64, ARM64 (qemu) and Windows.
 
 ## Skip it if...
 
-- you only chase credit — validate your expectations against stock first.
+- you only chase credit - validate your expectations against stock first.
 
-Feedback very welcome — especially from ARM board owners and anyone
-running long uninterrupted sessions.
+Feedback very welcome - especially from ARM board owners and anyone running
+long uninterrupted sessions.
