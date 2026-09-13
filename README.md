@@ -10,12 +10,36 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.1
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.2
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
+
+### v0.3.2 (current) - BOINC integration fixes
+
+Reported on the Einstein@Home forum right after v0.3.1: the app received a
+`STOP 1`/`process exited with code 1` from BOINC before doing any work, and
+BOINC sometimes reported "Not requesting tasks: don't need (no
+applications)". Three root causes found and fixed:
+
+- **`app_config.xml` was invalid**: `<fraction_done_xml>1</fraction_done_xml>`
+  is not a valid tag and an unknown `<options>` block made BOINC reject the
+  file. It now uses the correct `<fraction_done_exact/>` and nothing else.
+- **`app_info.xml` was missing the `<platform>` tag**. Without it BOINC did
+  not properly match the app to workunits, so tasks either never arrived or
+  the app was launched with no usable arguments (immediate `STOP 1`). All
+  packages now ship the correct platform tag for their architecture.
+- **The CLI parser was rebuilt from scratch**: it now handles the full
+  official FGRP5 command line exactly as BOINC delivers it in
+  anonymous-platform mode - split args, long flags, negative-number values
+  (e.g. `--f1dot -1e-13`), and even the entire command line arriving as a
+  single argv element. If required arguments are still missing at startup,
+  the app prints the exact `argc/argv` it received so any remaining issue
+  can be reported precisely.
+
+Direct command line still works unchanged on every platform.
 
 ### Why are there two versions (Linux and Windows)?
 
