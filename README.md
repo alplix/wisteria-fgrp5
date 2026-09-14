@@ -10,14 +10,32 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.2
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.3
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### v0.3.2 (current) - BOINC integration fixes
+### v0.3.3 (current) - BOINC app_info schema fix + --ephemdir directory support
+
+Two follow-up fixes from the Einstein@Home forum (reported by @baracutio
+and @toggleton):
+
+- **app_info.xml `<file_name>` → `<name>`**: the `<file_info>` block must
+  use `<name>wisteria</name>` (or `wisteria.exe`); the previous
+  `<file_name>` tag is only valid inside `<file_ref>` and made BOINC report
+  "missing application file". This was identified by @baracutio's own
+  modified app_info.xml which worked correctly.
+- **`--ephemdir` now accepts a directory**: BOINC passes
+  `--ephemdir .../einstein.phys.uwm.edu/JPLEPH` which is a directory, not a
+  file. Wisteria now probes the plain path first, then searches well-known
+  ephemeris file names (`JPLEPH.405`, `lnxp1600p1658.405`, `DE430.dat`, ...)
+  inside the directory before giving up.
+
+All five packages rebuilt; same top candidate `f0=12.3457260` verified.
+
+### v0.3.2 - BOINC CLI parser + app_config fixes
 
 Reported on the Einstein@Home forum right after v0.3.1: the app received a
 `STOP 1`/`process exited with code 1` from BOINC before doing any work, and
