@@ -10,14 +10,27 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.3
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.4
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### v0.3.3 (current) - BOINC app_info schema fix + --ephemdir directory support
+### v0.3.4 (current) - the semicoherent crash fix
+
+The big one. Every real multi-sky-point BOINC task (a typical FGRP5 search
+uses **12 sky points**) was dying with **"Output file ... absent"** right after
+the first sky point. Root cause: the module-level pair arrays inside
+`setup_pairs()` were allocated again on the 2nd sky point without being freed
+first, raising a Fortran runtime **"already allocated"** error that terminated
+the app (exit code 2). The arrays are now released before re-allocation.
+
+Verified with the official BOINC command line and explicit multi-sky-point
+runs: **12/12 sky points complete, RC=0, output file produced**. Single-sky
+and `--ephemdir` tests still pass unchanged.
+
+### v0.3.3 - BOINC app_info schema fix + --ephemdir directory support
 
 Two follow-up fixes from the Einstein@Home forum (reported by @baracutio
 and @toggleton):
