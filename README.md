@@ -10,14 +10,37 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.4
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.5
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### v0.3.4 (current) - the semicoherent crash fix
+### v0.3.5 (current) - the real BOINC fix
+
+Modern FGRP5 workunits from Einstein@Home no longer send `-o/--outputfile`
+on the command line (newer workunit generator; the client_state.xml command
+lines now end in `--debug 0 --debugCommandLineMangling` with no `-o`).
+Every earlier build required `-o`, so at startup they printed an
+`argc/argv` dump and exited before producing anything - and BOINC reported
+**"Output file ... absent"** for every single task. That argv dump is
+exactly what showed up in @baracutio's and @toggleton's stderr.
+
+**Root cause found and fixed.** Wisteria now reads the result name from
+`init_data.xml` (written by BOINC into the slot directory) and writes
+exactly the files BOINC expects:
+
+- `<result_name>_0` - the toplist,
+- `<result_name>_1` - the coherent follow-up.
+
+Verified with a BOINC-style command line (no `-o`, bare `--inputfile` and
+`--ephemdir JPLEPH.405`, `--debugCommandLineMangling` flag): both output
+files are created under the exact names the validator looks for, RC=0.
+Standalone runs with `-o` keep working unchanged. `app_info.xml` version
+bumped to **131** so BOINC picks up the new binaries.
+
+### v0.3.4 - the semicoherent crash fix
 
 The big one. Every real multi-sky-point BOINC task (a typical FGRP5 search
 uses **12 sky points**) was dying with **"Output file ... absent"** right after
