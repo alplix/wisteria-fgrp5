@@ -10,14 +10,39 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.5
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.6
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### v0.3.5 (current) - the real BOINC fix
+### v0.3.6 (current) - ephemeris diagnostics ("Bad real number in item 1")
+
+v0.3.5 fixed the output naming (confirmed by @toggleton and @baracutio: the
+`_0` and `_1` outputs now appear under exactly the names BOINC expects) but
+a second deterministic crash surfaced in the **ephemeris** loader:
+
+```
+At line 252 of file fgrp5_support.f90
+Fortran runtime error: Bad real number in item 1 of list input
+```
+
+That is the generic **LAL-text** ephemeris parser being handed a file that
+is not a JPL FITS file (a FITS file starts with `SIMPLE  =`). In the BOINC
+slot the file referenced as `--ephemdir JPLEPH.405` turns out not to be the
+standard FITS ephemeris, so detection falls through and the text parser
+trips over the first non-numeric line, exiting with code 2.
+
+**v0.3.6 turns that obscure crash into a real diagnostic:** the app now
+prints the offending header line, the file size and the first 128 bytes of
+the file (hex + as text) and stops with a clear
+`ERROR: bad LAL ephemeris header` message - so the next stderr shows
+exactly what that ephemeris file really is. Genuine LAL text tables and
+JPL FITS files keep working unchanged. `app_info.xml` version bumped to
+**132**.
+
+### v0.3.5 - the real BOINC fix
 
 Modern FGRP5 workunits from Einstein@Home no longer send `-o/--outputfile`
 on the command line (newer workunit generator; the client_state.xml command
