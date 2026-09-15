@@ -10,14 +10,40 @@ restricted per the upstream authors' request. GPLv2+ like upstream.
 
 ## Downloads
 
-- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.6
+- **[Latest release](https://github.com/alplix/wisteria-fgrp5/releases/latest)** - v0.3.7
   - Linux x86-64 tarball: static build, baseline ISA (runs on any 64-bit x86 CPU)
   - Linux x86-64 v3 tarball: AVX2/FMA optimized static build (2013+ CPUs, ~15-30% faster)
   - Linux aarch64 tarball: Jetson, Raspberry Pi 5, Ampere
   - Windows x64 baseline zip: self-contained executable, runs on any x64 CPU
   - Windows x64 v3 zip: AVX2/FMA build (2013+ CPUs, ~15-30% faster)
 
-### v0.3.6 (current) - ephemeris diagnostics ("Bad real number in item 1")
+### v0.3.7 (current) - hotfix: diagnostics now go to stderr
+
+v0.3.6's diagnostics were written to **stdout**; the BOINC client only
+captures **stderr**, so in BOINC the log showed just the banner, the
+correct output names and a bare `STOP 1` - the new "bad LAL ephemeris
+header" message and the file dump never appeared (confirmed by @baracutio's
+v0.3.6 stderr on task `LATeah2223F_872.0_258069_0.0_0`).
+
+v0.3.7 sends **every** progress and error line to stderr, so the ephemeris
+diagnostics are now visible in the task log. With a non-FITS ephemeris the
+next failing stderr should show:
+
+```
+% loading ephemeris: JPLEPH.405
+% not JPL FITS; loading as LAL text: JPLEPH.405
+ERROR: bad LAL ephemeris header, first token of:
+> <the actual first non-# line>
+file size: ...
+first bytes (hex): ...
+first bytes (text): ...
+```
+
+If you saw the bare `STOP 1` with v0.3.6, install v0.3.7 and paste the full
+stderr of one failing task - that message identifies the real ephemeris
+file format. `app_info.xml` bumped to **133**.
+
+### v0.3.6 - ephemeris diagnostics ("Bad real number in item 1")
 
 v0.3.5 fixed the output naming (confirmed by @toggleton and @baracutio: the
 `_0` and `_1` outputs now appear under exactly the names BOINC expects) but
